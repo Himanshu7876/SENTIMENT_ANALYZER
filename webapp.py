@@ -1,8 +1,11 @@
+# Part-3 "making web app and collecting feedbacks"
+
 import pandas as pd
 import streamlit as st
 
 st.set_page_config(page_icon=":)", page_title="Sentiment Analyzer", layout="centered")
 
+# training of model
 @st.cache(allow_output_mutation=True)
 def train_model(X, Y):
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -19,12 +22,14 @@ def train_model(X, Y):
     best_nb_classifier.fit(X_tfidf,Y)
     return best_nb_classifier, vectorizer
 
+# fxn for making final prediction 
 @st.cache
 def predict_sentiment(text, model, vectorizer):
     tweet_vectorized = vectorizer.transform([text])
     prediction = model.predict(tweet_vectorized)
     return prediction[0]
 
+# saving feedback in a csv file
 def save_feedback(feedback):
     try:
         df = pd.read_csv("feedback2.csv")
@@ -36,6 +41,7 @@ def save_feedback(feedback):
     df.to_csv("feedback2.csv", index=False)
     st.success("Feedback saved successfully")
 
+# importing data
 data = pd.read_csv('final_data1.csv')
 data = data.drop(data.columns[0], axis=1)
 data.rename(columns={'0': 'sentiments'}, inplace=True)
@@ -44,11 +50,12 @@ data.dropna(inplace=True, axis=0)
 X = data['Tweets']
 Y = data['sentiments']
 
-model, vectorizer = train_model(X, Y)
+model, vectorizer = train_model(X, Y)# fetching vectorizer and trained model
 
 st.title("Sentiment Analyzer")
 st.markdown("---")
 
+# text input 
 text = st.text_area("Enter text here")
 submit = st.button("Analyze")
 
@@ -56,6 +63,7 @@ if submit:
     if text.strip() == "":
         st.error("Please enter some text")
     else:
+        # calling prediction function(predict_sentiment) and printing the output)
         output = predict_sentiment(text, model, vectorizer)
         combine="Predicted sentiment : "+output
         st.success(combine)
