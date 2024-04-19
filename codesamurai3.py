@@ -9,9 +9,15 @@ def train_model(X, Y):
     from sklearn.naive_bayes import MultinomialNB
     vectorizer = TfidfVectorizer()
     X_tfidf = vectorizer.fit_transform(X)
+    from sklearn.model_selection import GridSearchCV
     model = MultinomialNB()
-    model.fit(X_tfidf, Y)
-    return model, vectorizer
+    param_grid = {'alpha': [0.1, 0.5, 1.0, 2.0]}
+    grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+    grid_search.fit(X_tfidf, Y)
+    best_params = grid_search.best_params_
+    best_nb_classifier = MultinomialNB(alpha=best_params['alpha'])
+    best_nb_classifier.fit(X_tfidf,Y)
+    return best_nb_classifier, vectorizer
 
 @st.cache
 def predict_sentiment(text, model, vectorizer):
@@ -62,4 +68,4 @@ if button_1:
         st.error("Please enter some feedback")
     else:
             save_feedback(feedback)
-
+            feedback = st.text_area("Enter feedback", value="")
