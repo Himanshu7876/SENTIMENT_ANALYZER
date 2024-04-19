@@ -36,7 +36,7 @@ def save_feedback(feedback):
     df.to_csv("feedback2.csv", index=False)
     st.success("Feedback saved successfully")
 
-data = pd.read_csv('final_data.csv')
+data = pd.read_csv('final_data2.csv')
 data = data.drop(data.columns[0], axis=1)
 data.rename(columns={'0': 'sentiments'}, inplace=True)
 data.dropna(inplace=True, axis=0)
